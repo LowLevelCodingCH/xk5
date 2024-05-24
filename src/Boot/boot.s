@@ -1,8 +1,8 @@
 [org 0x7c00]
 mov [BOOT_DISK], dl
 KERNEL_LOCATION equ 0x1000
-KERNEL_SIZE     equ 47
-msgb: db "END:     4",8,8,8,8,8,8,8,8,8,8,0xa,"STOP:    3",8,8,8,8,8,8,8,8,8,8,0xa,"OTHER:   2",8,8,8,8,8,8,8,8,8,8,0xa,"KERNEL:  1",8,8,8,8,8,8,8,8,8,8,0xa,"CHOOSE> ",0x0,0x0,0x0
+KERNEL_SIZE     equ 52
+msgb: db "END:     4",8,8,8,8,8,8,8,8,8,8,0xa,"STOP:    3",8,8,8,8,8,8,8,8,8,8,0xa,"OTHER:   2",8,8,8,8,8,8,8,8,8,8,0xa,"KERNEL:  1",8,8,8,8,8,8,8,8,8,8,0xa,"CHOOSE> ",0x0,0x0
 printB:
     mov ah, 0x0e
     mov al, [msgb + bx]
@@ -142,7 +142,7 @@ print_error:
     int 0x10
     jmp print_error
 
-error_msg db 'No Kernel Found!', 0
+error_msg db 'DISK ERROR', 0
 
 exit:
     hlt

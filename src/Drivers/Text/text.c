@@ -10,11 +10,68 @@ void update_cursor() {
     outb(0x3D5, position & 0xFF);
 }
 
+void reset_cursor() {
+  cursor = 0;
+
+  outb(0x3D4, 0x0E);
+  outb(0x3D5, (0 >> 8) & 0xFF);
+
+  outb(0x3D4, 0x0F);
+  outb(0x3D5, 0 & 0xFF);
+}
+
+void clear() {
+  reset_cursor();
+  for (size_t y = 0; y < 100; y++) {
+	for (size_t x = 0; x < 80; x++) {
+		const size_t index = y * 80 + x;
+		if(index % 2 == 0) *(char*)(0xb8000 + index) = ' ';
+	}
+  }
+  reset_cursor();
+}
+
 int ssize(char* str) {
 	int len = 0;
 	while (str[len])
 		len++;
 	return len;
+}
+
+char* scpy(register char *to, register const char *from) {
+	char *save = to;
+	for (int k = 0; from[k] != '\0'; ++k) to[k] = from[k];
+	return save;
+}
+
+char* scat(char* s1, char* s2) {
+	  scpy(s1 + ssize (s1), s2);
+	  return s1;
+}
+
+void cmdsplit(char* sys, char del, char result[][50], int* count) {
+  int i = 0;
+  int j = 0;
+  int k = 0;
+
+  while(sys[i] != 0) {
+    if(sys[i] == del) {
+      result[j][k] = 0;
+      j++;
+      k = 0;
+      if(j >= 10) {
+        break;
+      }
+    } else {
+      if(k < 50) {
+        result[j][k] = sys[i];
+        k++;
+      }
+    }
+    i++;
+  }
+  result[j][k] = 0;
+  *count = j+1;
 }
 
 int streq(const char *s1, const char *s2) {
