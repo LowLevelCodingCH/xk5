@@ -4,3 +4,4 @@ For linux: `https://github.com/mell-o-tron/MellOs/blob/main/A_Setup/setup-gcc-de
 then run `sh build.sh` and `qemu-system-x86_64 image.img`
 # Setting the user
 to set the user, type: `user /set <name>`, dont add spaces ANYWHERE, otherwise it WILL break
+Normally, it will prompt you with "username: " anyway...

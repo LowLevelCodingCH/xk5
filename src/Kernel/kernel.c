@@ -75,50 +75,32 @@ void pinit() {
   pfreeall();
 }
 
-void pinfo() {
-      kprintln("FREE?:");
-      kprintln("Page 0: ");
-      kprintln(int_to_string(page0.free));
-      kprintln("Page 1: ");
-      kprintln(int_to_string(page1.free));
-      kprintln("Page 2: ");
-      kprintln(int_to_string(page2.free));
-      kprintln("Page 3: ");
-      kprintln(int_to_string(page3.free));
-      kprintln("");
-      kprintln("ADDRESS?:");
-      kprintln("Page 0: ");
-      kprintln(int_to_string(page0.addr));
-      kprintln("Page 1: ");
-      kprintln(int_to_string(page1.addr));
-      kprintln("Page 2: ");
-      kprintln(int_to_string(page2.addr));
-      kprintln("Page 3: ");
-      kprintln(int_to_string(page3.addr));
-}
-
 int padding0[100] = {0};
 
 char* user = "DEFAULT.XK5.USER";
 
+void ls() {
+    kprintln("LS     XKB"); // XKB = X Kernel Builtin
+    kprintln("VER    XKB");
+    kprintln("ECHO   XKB");
+    kprintln("BEEP   XKB");
+    kprintln("CLEAR  XKB");
+    kprintln("USER   XKB");
+    kprintln("PALLOC XKB");
+    kprintln("PFREE  XKB");
+}
+
 void system(char cmd[10][50], int cnt) {
     if(streq(cmd[0], "ls") == 0 && cnt == 1) {
-      kprintln("LS     XKB"); // XKB = X Kernel Builtin
-      kprintln("VER    XKB");
-      kprintln("ECHO   XKB");
-      kprintln("CLEAR  XKB");
-      kprintln("USER   XKB");
-      kprintln("PALLOC XKB");
-      kprintln("PFREE  XKB");
-      kprintln("PINFO  XKB");
+      ls();
+    } else if(streq(cmd[0], "ver") == 0 && cnt == 1) {
+      kprintln("X-KERNEL V5");
+    } else if(streq(cmd[0], "beep") == 0 && cnt == 1) {
+      beep(650, 1000);
     } else if(streq(cmd[0], "palloc") == 0 && cnt == 1) {
       palloc();
     } else if(streq(cmd[0], "pfree") == 0 && cnt == 1) {
       pfree();
-    } else if(streq(cmd[0], "pinfo") == 0 && cnt == 1) {
-      pinfo();
-    } else if(streq(cmd[0], "ver") == 0 && cnt == 1) {
-      kprintln("X-KERNEL V5");
     } else if(streq(cmd[0], "echo") == 0) {
       int major = 0;
       for(int i = 1; i < cnt; i++) {
@@ -150,6 +132,10 @@ void kernel() {
 
 	init_pit();
 	beep(650, 1000);
+
+  kprint("username: ");
+
+  read_word(user, 256, ssize("username: "));
 
   for(;;){
     kprint(user);
