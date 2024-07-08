@@ -1,0 +1,3 @@
+compiler=i386-elf-gcc
+bootloader=grub
+linker=ld

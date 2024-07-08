@@ -1,5 +1,5 @@
 section .text
-  [bits 32]
-  [extern kernel]
-  call kernel
-  jmp $
+    [bits 32]
+    [extern nitrix_kernel]
+    call nitrix_kernel
+    jmp $
