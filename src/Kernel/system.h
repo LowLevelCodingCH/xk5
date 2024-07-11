@@ -530,7 +530,7 @@ Sprite create_sprite(pixel tex[SPRITE_WIDTH][SPRITE_HEIGHT]) {
     x = 0;
     y++;
   }
-        kprintln(int_to_string(__LINE__));
+  kprintln(int_to_string(__LINE__));
 
   return spr;
 }
@@ -589,7 +589,102 @@ typedef enum {
   CHAR_D,
 } LETTER;
 
+typedef struct {
+  unsigned int width;
+  unsigned int height;
+} field_t;
+
+#define MAX_WINDOWS_CNT 3
+#define MAX_ELEMENT_CNT 5
+
+typedef struct {
+  unsigned int x;
+  unsigned int y;
+  char exists; // false
+} element_t;
+
+typedef struct {
+  unsigned int x;
+  unsigned int y;
+  unsigned int w;
+  unsigned int h;
+  int id;
+  char exists;
+  char* title;
+  element_t elements[MAX_ELEMENT_CNT];
+} window_t;
+
+pixel cbtn[SPRITE_WIDTH][SPRITE_HEIGHT] = {
+  {04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04},
+  {04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04},
+  {04, 04, 00, 04, 04, 04, 04, 04, 04, 00, 04, 04},
+  {04, 04, 04, 00, 04, 04, 04, 04, 00, 04, 04, 04},
+  {04, 04, 04, 04, 00, 04, 04, 00, 04, 04, 04, 04},
+  {04, 04, 04, 04, 04, 00, 00, 04, 04, 04, 04, 04},
+  {04, 04, 04, 04, 04, 00, 00, 04, 04, 04, 04, 04},
+  {04, 04, 04, 04, 00, 04, 04, 00, 04, 04, 04, 04},
+  {04, 04, 04, 00, 04, 04, 04, 04, 00, 04, 04, 04},
+  {04, 04, 00, 04, 04, 04, 04, 04, 04, 00, 04, 04},
+  {04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04},
+  {04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04}
+};
+
+
+
+void draw_window(window_t *window) {
+  Sprite close_btn = create_sprite(cbtn);
+  unsigned int width  = window->w;
+  unsigned int height = window->h;
+  unsigned int x      = window->x;
+  unsigned int y      = window->y;
+  signed   int id     = window->id;
+
+  field_t field;
+  field.width  = width;
+  field.height = height;
+
+  // Draw content to the field
+  for(int i = 0; i < field.height; i++) {
+    for(int j = 0; j < field.width; j++) {
+      draw_pixel(j+x, i+y, 7);
+    }
+  }
+
+  draw_sprite(window->x, window->y, close_btn, 0);
+
+  draw_text(window->title, window->x + SPRITE_WIDTH, window->y, 0);
+
+  // ELEMENTS
+  //
+  for(int i = 0; i < MAX_ELEMENT_CNT; i++) {
+    // DRAW_ELEMENT(ELEMENT);
+  }
+}
+
 void gmode(void) {
+  window_t window;
+  window_t windows[MAX_WINDOWS_CNT];
+
+  window.w = 60;
+  window.h = 110;
+  window.x = 4;
+  window.y = 9;
+  window.exists = 1;
+  window.title = "test";
+
+  windows[0] = window;
+
+  window_t window1;
+
+  window1.w = 80;
+  window1.h = 100;
+  window1.x = 50;
+  window1.y = 40;
+  window1.exists = 1;
+  window1.title = "test1";
+
+  windows[1] = window1;
+
   kprintln(int_to_string(__LINE__));
 
   int character_point = 0;
@@ -616,10 +711,11 @@ void gmode(void) {
   for(;;){
     draw_sprite(x, y, cur, 1);
     // other graphics
-
-    if(bP)draw_sprite(100+character_point,100,let_b,0);
-    if(aP)draw_sprite(100+2+character_point,100,let_a,0);
-
+    for(int i = 0; i < MAX_WINDOWS_CNT; i++) {
+      if(windows[i].exists != 0) {
+        draw_window(&windows[i]);
+      }
+    }
     // here:
     //...
     draw_sprite(x, y, cur, 0);
@@ -628,34 +724,15 @@ void gmode(void) {
 
     if(cgr == 'w' && y > 0)  {
       y--;
-      lp = CHAR_W;
-      character_point+=SPRITE_WIDTH;
     }
     if(cgr == 's' && y < 200){
       y++;
-      lp = CHAR_S;
-      character_point+=SPRITE_WIDTH;
     }
     if(cgr == 'a' && x > 0)  {
-      aP = 1;
-      lp = CHAR_A;
       x--;
-      character_point+=SPRITE_WIDTH;
     }
     if(cgr == 'd' && x < 320){
       x++;
-      lp = CHAR_D;
-      character_point+=SPRITE_WIDTH;
-    }
-    if(cgr == 'b' && x < 320){
-      bP = 1;
-      lp = CHAR_B;
-      character_point+=SPRITE_WIDTH;
-    }
-    if(cgr == 5) {
-      if(lp == CHAR_B)bP = 0;
-      if(lp == CHAR_A)aP = 0;
-      character_point-=SPRITE_WIDTH;
     }
   }
 }

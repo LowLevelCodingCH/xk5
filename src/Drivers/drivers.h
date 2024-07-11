@@ -14,6 +14,8 @@ void write_pixel1(unsigned x, unsigned y, unsigned c);
 /*static*/ unsigned get_fb_seg(void);
 /*static*/ void vpokeb(unsigned off, unsigned val);
 /*static*/ void font512(void);
+void draw_char(char c, int x, int y, int Colour);
+void draw_text(char* s, int x, int y, int Colour);
 
 // Sound
 void init_speaker();
