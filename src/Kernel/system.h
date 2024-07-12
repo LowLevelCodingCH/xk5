@@ -507,7 +507,7 @@ void draw_sprite(int x, int y, Sprite spr, int only) {
     row r = spr.spr[i];
     for(int j = 0; j < SPRITE_WIDTH; j++) {
       pixel p = r.r[j];
-      draw_pixel(px, py, p.color);
+      if(p.color != 15)draw_pixel(px, py, p.color);
       px++;
     }
     py++;
@@ -538,16 +538,16 @@ Sprite create_sprite(pixel tex[SPRITE_WIDTH][SPRITE_HEIGHT]) {
 pixel cursor_texture[SPRITE_WIDTH][SPRITE_HEIGHT] = {
   {00, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
   {00, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 00, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 00, 00, 15, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 00, 00, 00, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 00, 00, 00, 15, 15, 15, 15, 15, 15},
-  {00, 15, 15, 00, 00, 15, 15, 15, 15, 15, 15, 15},
+  {00, 63, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15},
+  {00, 63, 63, 00, 15, 15, 15, 15, 15, 15, 15, 15},
+  {00, 63, 63, 63, 00, 15, 15, 15, 15, 15, 15, 15},
+  {00, 63, 63, 63, 63, 00, 15, 15, 15, 15, 15, 15},
+  {00, 00, 00, 63, 00, 00, 15, 15, 15, 15, 15, 15},
+  {00, 15, 00, 63, 00, 15, 15, 15, 15, 15, 15, 15},
+  {15, 15, 00, 63, 00, 15, 15, 15, 15, 15, 15, 15},
   {15, 15, 15, 00, 00, 15, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 00, 00, 00, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 15, 00, 00, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 15, 00, 00, 15, 15, 15, 15, 15, 15}
+  {15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
+  {15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15}
 };
 
 
@@ -594,6 +594,10 @@ typedef struct {
   unsigned int height;
 } field_t;
 
+typedef struct {
+  uint32_t w,h,y,x;
+} rect_t;
+
 #define MAX_WINDOWS_CNT 3
 #define MAX_ELEMENT_CNT 5
 
@@ -629,7 +633,13 @@ pixel cbtn[SPRITE_WIDTH][SPRITE_HEIGHT] = {
   {04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04, 04}
 };
 
-
+void draw_rect(rect_t *rect, unsigned char color) {
+  for(int i = 0; i < rect->h; i++) {
+    for(int j = 0; j < rect->w; j++) {
+      draw_pixel(j+rect->x, i+rect->y, color);
+    }
+  }
+}
 
 void draw_window(window_t *window) {
   Sprite close_btn = create_sprite(cbtn);
@@ -661,28 +671,25 @@ void draw_window(window_t *window) {
   }
 }
 
-void gmode(void) {
-  window_t window;
-  window_t windows[MAX_WINDOWS_CNT];
+window_t windows[MAX_WINDOWS_CNT];
 
-  window.w = 60;
-  window.h = 110;
-  window.x = 4;
-  window.y = 9;
+window_t create_xkwm_window(int width, int height, int x, int y, char *title){
+  window_t window;
+  window.w = width;
+  window.h = height;
+  window.x = x;
+  window.y = y;
   window.exists = 1;
-  window.title = "test";
+  window.title = title;
+  return window;
+} // XKWM
+
+void gmode(void) {
+  window_t window = create_xkwm_window(110, 50, 20, 8, "test #0");
+
+  window_t window1 = create_xkwm_window(40, 80, 100, 30, "test #1");
 
   windows[0] = window;
-
-  window_t window1;
-
-  window1.w = 80;
-  window1.h = 100;
-  window1.x = 50;
-  window1.y = 40;
-  window1.exists = 1;
-  window1.title = "test1";
-
   windows[1] = window1;
 
   kprintln(int_to_string(__LINE__));
@@ -699,15 +706,10 @@ void gmode(void) {
   LETTER lp;
   int x = 12;
   int y = 12;
-  int aP = 0;
-  int bP = 0;
   char cgr = 0x00;
-  vga_init();
-  for(int i = 0; i < 320*200; i++)
-    *(char*)(0xa0000 + i) = 0;
+  lidfk();
   for(int i = 0; i < 320*200; i++)
     *(char*)(0xa0000 + i) = 15;
-  int k = 0;
   for(;;){
     draw_sprite(x, y, cur, 1);
     // other graphics

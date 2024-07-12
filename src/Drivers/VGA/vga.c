@@ -2576,7 +2576,7 @@ void dump_state(void)
 }
 
 void lidfk() {
-    write_regs(g_640x480x2);
+    write_regs(g_320x200x256);
 }
 
 void set_text_mode(int hi_res)
@@ -2859,4 +2859,10 @@ void draw_text(char* s, int x, int y, int Colour) {
 	if (s == NULL) return;
 	for (size_t i = 0; s[i] != 0; ++i)
 		draw_char(s[i], x + i * FONT_WIDTH, y, Colour);
+}
+
+void vga_test() {
+    for(unsigned char i = 0; i < 256; i++) {
+        draw_pixel(0, i, (char)i);
+    }
 }

@@ -16,6 +16,7 @@ void write_pixel1(unsigned x, unsigned y, unsigned c);
 /*static*/ void font512(void);
 void draw_char(char c, int x, int y, int Colour);
 void draw_text(char* s, int x, int y, int Colour);
+void vga_test();
 
 // Sound
 void init_speaker();
