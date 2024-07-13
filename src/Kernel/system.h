@@ -671,7 +671,7 @@ void draw_window(window_t *window) {
   }
 }
 
-window_t windows[MAX_WINDOWS_CNT];
+window_t windows[MAX_WINDOWS_CNT]; //TODO: make a ptr so shit is updatable
 
 window_t create_xkwm_window(int width, int height, int x, int y, char *title){
   window_t window;
