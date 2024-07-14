@@ -536,18 +536,18 @@ Sprite create_sprite(pixel tex[SPRITE_WIDTH][SPRITE_HEIGHT]) {
 }
 
 pixel cursor_texture[SPRITE_WIDTH][SPRITE_HEIGHT] = {
-  {00, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 63, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 63, 63, 00, 15, 15, 15, 15, 15, 15, 15, 15},
-  {00, 63, 63, 63, 00, 15, 15, 15, 15, 15, 15, 15},
-  {00, 63, 63, 63, 63, 00, 15, 15, 15, 15, 15, 15},
-  {00, 00, 00, 63, 00, 00, 15, 15, 15, 15, 15, 15},
-  {00, 15, 00, 63, 00, 15, 15, 15, 15, 15, 15, 15},
-  {15, 15, 00, 63, 00, 15, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 00, 00, 15, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15},
-  {15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15}
+  {15, 00, 00, 15, 15, 15, 15, 15, 15, 15, 15, 15},
+  {15, 00, 63, 00, 15, 15, 15, 15, 15, 15, 15, 15},
+  {15, 00, 63, 63, 00, 15, 15, 15, 15, 15, 15, 15},
+  {15, 00, 63, 63, 63, 00, 15, 15, 15, 15, 15, 15},
+  {15, 00, 63, 63, 63, 63, 00, 15, 15, 15, 15, 15},
+  {15, 00, 63, 63, 63, 63, 63, 00, 15, 15, 15, 15},
+  {15, 00, 63, 63, 63, 63, 63, 00, 15, 15, 15, 15},
+  {15, 00, 63, 63, 63, 63, 00, 15, 15, 15, 15, 15},
+  {15, 00, 63, 00, 00, 63, 00, 15, 15, 15, 15, 15},
+  {15, 00, 00, 15, 15, 00, 63, 00, 15, 15, 15, 15},
+  {15, 15, 15, 15, 15, 00, 63, 00, 15, 15, 15, 15},
+  {15, 15, 15, 15, 15, 15, 00, 15, 15, 15, 15, 15}
 };
 
 
@@ -675,6 +675,29 @@ WHND add_window(window_t window) {
   return &windows[free_window_spot];
 }
 
+WHND find_window(unsigned int x, unsigned int y) {
+	for (size_t i = MAX_WINDOWS_CNT-1; i != -1; i--) {
+		if (x >= windows[i].x && x < windows[i].x + windows[i].w &&
+			y >= windows[i].y && y < windows[i].y + windows[i].h) {
+
+			return &windows[i];
+		}
+	}
+
+	return NULL;
+}
+
+void nullify_window(WHND wptr) {
+  free_window_spot--;
+  wptr->exists = 0;
+  wptr->x = 1000;
+  wptr->y = 1000;
+  wptr->w = 0;
+  wptr->h = 0;
+  scpy(wptr->title, "");
+  wptr = NULL;
+}
+
 window_t create_xkwm_window(int width, int height, int x, int y, char *title){
   window_t window;
   window.w = width;
@@ -718,6 +741,15 @@ void gmode(void) {
 
     cgr = read_char();
 
+    if(cgr == 10) {
+      WHND wptr = find_window(x, y);
+      if(x >= wptr->x + 0 && x <= wptr->x + SPRITE_WIDTH) {
+        if(y >= wptr->y + 0 && y <= wptr->y + SPRITE_HEIGHT) {
+          nullify_window(wptr);
+          wptr = NULL;
+        }
+      }
+    }
     if(cgr == 'w' && y > 0)  {
       y--;
     }
