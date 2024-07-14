@@ -65,5 +65,5 @@ void kernel(void) {
 }
 
 void nitrix_kernel(void) {
-  kernel();
+  gmode();
 }
