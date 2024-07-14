@@ -641,22 +641,13 @@ void draw_rect(rect_t *rect, unsigned char color) {
   }
 }
 
-void draw_window(window_t *window) {
+void draw_window(window_t* window) {
   Sprite close_btn = create_sprite(cbtn);
-  unsigned int width  = window->w;
-  unsigned int height = window->h;
-  unsigned int x      = window->x;
-  unsigned int y      = window->y;
-  signed   int id     = window->id;
-
-  field_t field;
-  field.width  = width;
-  field.height = height;
 
   // Draw content to the field
-  for(int i = 0; i < field.height; i++) {
-    for(int j = 0; j < field.width; j++) {
-      draw_pixel(j+x, i+y, 7);
+  for(int i = 0; i <   window->h; i++) {
+    for(int j = 0; j < window->w; j++) {
+      draw_pixel(j+window->x, i+window->y, 7);
     }
   }
 
@@ -671,7 +662,18 @@ void draw_window(window_t *window) {
   }
 }
 
-window_t windows[MAX_WINDOWS_CNT]; //TODO: make a ptr so shit is updatable
+typedef window_t* WHND;
+
+int free_window_spot = 0;
+
+window_t windows[MAX_WINDOWS_CNT];
+
+WHND add_window(window_t window) {
+  if(free_window_spot != -1) windows[free_window_spot] = window;
+  if(free_window_spot < MAX_WINDOWS_CNT) free_window_spot++;
+  else {free_window_spot = -1;}
+  return &windows[free_window_spot];
+}
 
 window_t create_xkwm_window(int width, int height, int x, int y, char *title){
   window_t window;
@@ -685,23 +687,16 @@ window_t create_xkwm_window(int width, int height, int x, int y, char *title){
 } // XKWM
 
 void gmode(void) {
-  window_t window = create_xkwm_window(110, 50, 20, 8, "test #0");
-
+  window_t window0 = create_xkwm_window(110, 50, 20, 8, "test #0");
   window_t window1 = create_xkwm_window(40, 80, 100, 30, "test #1");
 
-  windows[0] = window;
-  windows[1] = window1;
-
-  kprintln(int_to_string(__LINE__));
-
-  int character_point = 0;
+  WHND win0 = add_window(window0);
+  WHND win1 = add_window(window1);
 
   Sprite cur = create_sprite(cursor_texture);
 
   Sprite let_a = create_sprite(letter_a);
   Sprite let_b = create_sprite(letter_b);
-
-  kprintln(int_to_string(__LINE__));
 
   LETTER lp;
   int x = 12;
@@ -718,7 +713,6 @@ void gmode(void) {
         draw_window(&windows[i]);
       }
     }
-    // here:
     //...
     draw_sprite(x, y, cur, 0);
 
